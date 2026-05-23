@@ -1,21 +1,42 @@
-require('dotenv').config(); // Load env vars from .env file
+require('dotenv').config();
 
 const express = require('express');
-const app = express();
-app.use(express.json());
+const path = require('path');
 
-app.get('/', (req, res) => res.send('Welcome to User API!'));
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'Front-end')));
+
+// Routes
+app.get('/about', (req, res) => {
+  res.send('My Week 2 API!');
+});
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Front-end', 'Conan.html'));
+});
 
 app.post('/register', (req, res) => {
   const { name, email } = req.body;
-  if (!name || !email) return res.status(400).json({ error: 'Missing fields'});
-  //Simulate DB save
-  res.status(201).json({ message: `Registered: ${name} (${email})`});
 
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Missing fields' });
+  }
+
+  res.status(201).json({ message: `Hello ${name}!` });
 });
 
 app.get('/user/:id', (req, res) => {
-  res.json({ id: req.params.id, name: "Sample User"});
+  res.json({
+    id: req.params.id,
+    name: `User ${req.params.id} profile`
+  });
 });
 
-app.listen(3000, () => consol.log('API Live on PORT 3000'));
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
